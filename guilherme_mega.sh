@@ -45,7 +45,7 @@ echo "Aguarde Alguns Instantes para a Finalização"
 # Diretório de Destino
 #DIR_DESTINO=/tmp/backup
 
-DIR_BACKUP=/"/tmp/backup/";
+DIR_BACKUP=/"/media/facility-backup/";
 DATA=$(date +'%d-%m-%y');
 ARQUIVO="$DIR_BACKUP/guilherme_$DATA.tar.gz";
 
@@ -57,13 +57,13 @@ mkdir $DIR_BACKUP;
 fi
 #fim do if;
 #Compacta o arquivo e salva na pasta /tmp/backup.
-tar -cvzf "$ARQUIVO" /media/hd-Facility-ARQUIVOS/guilherme;
+tar -cvzf "$ARQUIVO" /media/facility-empresa/guilherme;
 
 #Envia o Arquivo para o Mega.
 megaput "$ARQUIVO";
 #verifica se os aruivos estao a mais de um dia e deleta
 echo "Removendo os backups, deixando sempre dos ultimos 1 dias"
-find /tmp/backup -name "*.gz" -ctime +1 -exec rm {} \;
+find /media/facility-backup -name "*.gz" -ctime +1 -exec rm {} \;
 #find $DIR_DESTINO -type f -mtime $TIME -delete
 
 
