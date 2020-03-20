@@ -1,5 +1,5 @@
 
-    sudo apt install megatools wget
+    sudo apt install megatools -y
     cd 
     sudo touch ~/.megarc
     echo "[Login]" >> ~/.megarc
