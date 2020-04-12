@@ -54,9 +54,9 @@ echo "Aguarde Alguns Instantes para a Finalização"
 DATA=$(date +'%d-%m-%y');
 HOUR=(date +"%T");
 START=$(date +%s);
-DIR_BACKUP="/tmp/backup";
+DIR_BACKUP="/media/Facility-Backup/facility-backup";
 FILENAME="Atendimento_";
-DIR_ARQUIVAR="/media/facility-backup/";
+
 
 ARQUIVO="$DIR_BACKUP/$FILENAME$DATA.tar.gz";
 
@@ -77,7 +77,7 @@ if [ ! -d $ARQUIVO ]; then
 fi
 #verifica se os aruivos estao a mais de um dia e deleta
 echo "Removendo os backups, deixando sempre dos ultimos 1 dias"
-find /media/facility-empresa/atendimento -name "*.gz" -ctime +1 -exec rm {} \;
+find DIR_BACKUP -name "*.gz" -ctime +1 -exec rm {} \;
 #find $DIR_DESTINO -type f -mtime $TIME -delete
 
 END=$(date +%s);
