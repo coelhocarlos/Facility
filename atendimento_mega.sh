@@ -1,3 +1,8 @@
+############################################################################################################
+# use crontab -e 
+# 0 */6 * * * /path-to-script //a cada seis horas
+# service cron reload
+
 #███╗   ███╗███████╗ ██████╗  █████╗ 
 #████╗ ████║██╔════╝██╔════╝ ██╔══██╗
 #██╔████╔██║█████╗  ██║  ███╗███████║
@@ -40,15 +45,20 @@ echo "..."
 echo "Aguarde Alguns Instantes para a Finalização"
 
 # Idade do arquivo em dias (+dias = acima de N dias)
-TIME="+10"
+#TIME="+10"
 
 # Diretório de Destino
 #DIR_DESTINO=/tmp/backup
-
-DIR_BACKUP=/"/media/facility-backup/";
+#diretorio temporario 
+#data do arquivo
 DATA=$(date +'%d-%m-%y');
-ARQUIVO="$DIR_BACKUP/atendimento_$DATA.tar.gz";
+HOUR=(date +"%T");
+START=$(date +%s);
+DIR_BACKUP="/tmp/backup";
+FILENAME="Atendimento_";
+DIR_ARQUIVAR="/media/facility-backup/";
 
+ARQUIVO="$DIR_BACKUP/$FILENAME$DATA.tar.gz";
 
 #verifica se o diretorio exise, se o diretorio não existir cria o diretorio. -d verifica se existe, !-d verifica 
 #se não existe.
@@ -57,18 +67,23 @@ mkdir $DIR_BACKUP;
 fi
 #fim do if;
 #Compacta o arquivo e salva na pasta /tmp/backup.
-tar -cvzf "$ARQUIVO" /media/facility-empresa/atendimento;
-
+tar -cvzf "$ARQUIVO" $DIR_ARQUIVAR;
 #Envia o Arquivo para o Mega.
-megaput "$ARQUIVO";
+megaput "$ARQUIVO"
+
+if [ ! -d $ARQUIVO ]; then
+
+ echo "BACKUP." $FILENAME "Enviado para o mega as $HOUR" | mailx -r servidor@ccstudio.com.br -s AVISO contato@ccstudio.com.br
+fi
 #verifica se os aruivos estao a mais de um dia e deleta
 echo "Removendo os backups, deixando sempre dos ultimos 1 dias"
-find /media/facility-backup -name "*.gz" -ctime +1 -exec rm {} \;
+find /media/facility-empresa/atendimento -name "*.gz" -ctime +1 -exec rm {} \;
 #find $DIR_DESTINO -type f -mtime $TIME -delete
 
-
+END=$(date +%s);
+DIFF=$(( $END - $START ));
 echo "......."
-echo "BACK-UP Concluído."
+echo "O script terminou no tempo de $DIFF seconds";
 
 ############################################################################################################
 # use crontab -e 
