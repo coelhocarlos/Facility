@@ -58,7 +58,9 @@ echo -e "${MAGENTA}Abrindo Portas para a internet";
  iptables -A INPUT -p tcp --destination-port 21 -j ACCEPT
 echo -e "${GREEN} 21 OK FTP";
  iptables -A INPUT -p tcp --destination-port 22 -j ACCEPT
-echo -e "${GREEN} 22 OK SSH";
+ echo -e "${GREEN} 21 OK FTP";
+iptables -A INPUT -p tcp --destination-port 2244 -j ACCEPT
+echo -e "${GREEN} 2244 OK SSH";
  iptables -A INPUT -p tcp --destination-port 2121 -j ACCEPT
 echo -e "${GREEN} Porta alternativa para FTP 2121 OK";
  iptables -A INPUT -p tcp --destination-port 53 -j ACCEPT
@@ -83,26 +85,28 @@ echo -e "${GREEN} Porta Webmin 10000 padrão OK";
 echo -e "${GREEN} Porta Webmin 11000 Alternativa OK";
  iptables -A INPUT -p tcp -m tcp --destination-port 25565 -j ACCEPT
 echo 1 > /proc/sys/net/ipv4/ip_forward
-iptables -t nat -A PREROUTING -p tcp -i enp1s0 -d 179.111.244.97 --dport 34599 -j DNAT --to-destination 192.168.15.55:34599
-iptables -t nat -A PREROUTING -p tcp -i enp1s0 -d 179.111.244.97 --dport 34599 -j DNAT --to-destination 192.168.15.55:34599
-iptables -t nat -A PREROUTING -p tcp -i enp1s0 -d 179.111.244.97 --dport 34567 -j DNAT --to-destination 192.168.15.55:34567
-iptables -t nat -A PREROUTING -p tcp -i enp1s0 -d 179.111.244.97 --dport 34567 -j DNAT --to-destination 192.168.15.55:34567
+iptables -t nat -A PREROUTING -p tcp -i enp2s0 -d 179.111.244.97 --dport 34599 -j DNAT --to-destination 192.168.15.69:34599
+iptables -t nat -A PREROUTING -p tcp -i enp2s0 -d 179.111.244.97 --dport 34599 -j DNAT --to-destination 192.168.15.69:34599
+iptables -t nat -A PREROUTING -p tcp -i enp2s0 -d 179.111.244.97 --dport 34567 -j DNAT --to-destination 192.168.15.69:34567
+iptables -t nat -A PREROUTING -p tcp -i enp2s0 -d 179.111.244.97 --dport 34567 -j DNAT --to-destination 192.168.15.69:34567
 
-iptables -t nat -A PREROUTING -p tcp -i enp1s0 -d 0.0.0.0/24 --dport 34599 -j DNAT --to-destination 192.168.15.55:34599
-iptables -t nat -A PREROUTING -p tcp -i enp1s0 -d 0.0.0.0/24 --dport 34599 -j DNAT --to-destination 192.168.15.55:34599
-iptables -t nat -A PREROUTING -p tcp -i enp1s0 -d 0.0.0.0/24 --dport 34567 -j DNAT --to-destination 192.168.15.55:34567
-iptables -t nat -A PREROUTING -p tcp -i enp1s0 -d 0.0.0.0/24 --dport 34567 -j DNAT --to-destination 192.168.15.55:34567
+iptables -t nat -A PREROUTING -p tcp -i enp2s0 -d 0.0.0.0/24 --dport 34599 -j DNAT --to-destination 192.168.15.69:34599
+iptables -t nat -A PREROUTING -p tcp -i enp2s0 -d 0.0.0.0/24 --dport 34599 -j DNAT --to-destination 192.168.15.69:34599
+iptables -t nat -A PREROUTING -p tcp -i enp2s0 -d 0.0.0.0/24 --dport 34567 -j DNAT --to-destination 192.168.15.69:34567
+iptables -t nat -A PREROUTING -p tcp -i enp2s0 -d 0.0.0.0/24 --dport 34567 -j DNAT --to-destination 192.168.15.69:34567
 
 # Allow incoming SSH
 echo -e "${MAGENTA=}Abrindo Incomming para SSH";
- iptables -A INPUT -i enp1s0 -p tcp --dport 22 -m state --state NEW,ESTABLISHED -j ACCEPT
- iptables -A OUTPUT -o enp1s0  -p tcp --sport 22 -m state --state ESTABLISHED -j ACCEPT
+ iptables -A INPUT -i enp2s0 -p tcp --dport 22 -m state --state NEW,ESTABLISHED -j ACCEPT
+ iptables -A OUTPUT -o enp2s0  -p tcp --sport 22 -m state --state ESTABLISHED -j ACCEPT
+ iptables -A INPUT -i enp2s0 -p tcp --dport 2244 -m state --state NEW,ESTABLISHED -j ACCEPT
+ iptables -A OUTPUT -o enp2s0  -p tcp --sport 2244 -m state --state ESTABLISHED -j ACCEPT
 echo -e "${GREEN} Porta Aberta para SSH OK";
 echo -e "${MAGENTA}Rediecionamento de Portas 80 para 8080";
 # Redirect 8080 to 80
- iptables -A INPUT -i enp1s0 -p tcp --dport 80 -j ACCEPT
- iptables -A INPUT -i enp1s0 -p tcp --dport 8585 -j ACCEPT
- iptables -A PREROUTING -t nat -i enp1s0 -p tcp --dport 8585 -j REDIRECT --to-port 80
+ iptables -A INPUT -i enp2s0 -p tcp --dport 80 -j ACCEPT
+ iptables -A INPUT -i enp2s0 -p tcp --dport 8585 -j ACCEPT
+ iptables -A PREROUTING -t nat -i enp2s0 -p tcp --dport 8585 -j REDIRECT --to-port 80
 echo -e "${GREEN} Adcionado Portas 80 para 8080 e OK";
 echo -e "${MAGENTA}Liberando Samba portas padores Rede ";
 # Allow incoming Samba
@@ -117,10 +121,10 @@ sudo iptables -A INPUT -s 192.168.0.0/24 -p tcp -m tcp --dport 445 -j ACCEPT
 echo -e "${GREEN} Portas Liberadas SAMBA 137 138 139 e 445 ";
 echo -e "${MAGENTA}Liberando OPENVPN";
 #VPN
- iptables -A INPUT -i enp1s0 -m state --state NEW -p udp --dport 1194 -j ACCEPT
+ iptables -A INPUT -i enp2s0 -m state --state NEW -p udp --dport 1194 -j ACCEPT
  iptables -A INPUT -i tun+ -j ACCEPT
  iptables -A FORWARD -i tun+ -j ACCEPT
- iptables -A FORWARD -i tun+ -o enp1s0 -m state --state RELATED,ESTABLISHED -j ACCEPT
+ iptables -A FORWARD -i tun+ -o enp2s0 -m state --state RELATED,ESTABLISHED -j ACCEPT
  iptables -A FORWARD -i enp1s0 -o tun+ -m state --state RELATED,ESTABLISHED -j ACCEPT
  iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o enp1s0 -j MASQUERADE
  iptables -A OUTPUT -o tun+ -j ACCEPT
