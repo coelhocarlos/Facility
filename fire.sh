@@ -125,8 +125,8 @@ echo -e "${MAGENTA}Liberando OPENVPN";
  iptables -A INPUT -i tun+ -j ACCEPT
  iptables -A FORWARD -i tun+ -j ACCEPT
  iptables -A FORWARD -i tun+ -o enp2s0 -m state --state RELATED,ESTABLISHED -j ACCEPT
- iptables -A FORWARD -i enp1s0 -o tun+ -m state --state RELATED,ESTABLISHED -j ACCEPT
- iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o enp1s0 -j MASQUERADE
+ iptables -A FORWARD -i enp2s0 -o tun+ -m state --state RELATED,ESTABLISHED -j ACCEPT
+ iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o enp2s0 -j MASQUERADE
  iptables -A OUTPUT -o tun+ -j ACCEPT
 echo -e "${GREEN} OPENVPN Liberado e OK";
 echo -e "${MAGENTA} Liberando Portas Alternativas para FTP usando 2121";
@@ -134,7 +134,7 @@ echo -e "${MAGENTA} Liberando Portas Alternativas para FTP usando 2121";
  modprobe ip_conntrack_ftp
  modprobe ip_nat_ftp
  iptables -A PREROUTING -t raw -p tcp --dport 2121 -d 192.168.15.100 -j CT --helper ftp
- iptables -t nat -A PREROUTING -p tcp --destination-port 20:2121 -i enp1s0 -j DNAT --to-destination 192.168.15.100
+ iptables -t nat -A PREROUTING -p tcp --destination-port 20:2121 -i enp2s0 -j DNAT --to-destination 192.168.15.100
 echo -e "${GREEN} Porta alternativa liberada FTP 21 para redirecionada 2121";
 echo -e "${MAGENTA} Ignorando pings ICMP";
 # Ignora pings
